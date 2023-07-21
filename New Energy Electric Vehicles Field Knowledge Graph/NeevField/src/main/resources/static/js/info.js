@@ -567,7 +567,8 @@ function companyInfo(data) {
 function industryInfo(data) {
     let content = ``;
     let indName = data.indName;
-    if (content.length == 0){
+    let desContent = data.description.desContent;
+    if (desContent.length == 0){
         content = content + `<div>
                                 <div class="title">产业名称</div>
                                 <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>
@@ -576,7 +577,8 @@ function industryInfo(data) {
     }else {
         content = content + `<div>
                                 <div class="title">产业名称</div>
-                                <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>
+                                <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>                      
+                                <div class="content">${desContent}</div>    
                             </div>`;
     }
 

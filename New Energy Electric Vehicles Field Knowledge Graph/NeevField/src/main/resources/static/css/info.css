@@ -120,6 +120,7 @@ main{
     text-align: justify;
     text-indent: 2em;
     position: relative;
+    word-wrap: break-word;
 }
 
 .content .error{

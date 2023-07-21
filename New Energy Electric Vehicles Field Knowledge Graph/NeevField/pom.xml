@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>indi.zyang</groupId>
   <artifactId>NeevField</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <version>0.10.2-SNAPSHOT</version>
   <name>NeevField</name>
   <description>New Energy Electric Vehicles Field Knowledge Graph</description>
@@ -74,7 +74,12 @@
   </dependencies>
 
   <build>
-    <finalName>NeevField</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
 </project>
