@@ -38,6 +38,9 @@ public class Industry {
     //产业市值(单位/亿)
     private int marketValue;
 
+    //颜色
+    private String color;
+
     //产业内公司列表
     private List<Company> companyList;
 
@@ -123,4 +126,12 @@ public class Industry {
     public int getCategory() {return 1;}
 
     public String getStringIndId() {return "ind"+this.indId;}
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 }

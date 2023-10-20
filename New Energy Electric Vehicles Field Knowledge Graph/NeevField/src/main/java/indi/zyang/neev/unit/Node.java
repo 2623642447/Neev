@@ -9,8 +9,20 @@ public class Node {
     private double value;
     private int category;
     private int group;
+    private String color;
 
     public Node() {
+    }
+
+    public Node(String id, String name, double symbolSize, double x, double y, double value, int category, String color) {
+        this.id = id;
+        this.name = name;
+        this.symbolSize = symbolSize;
+        this.x = x;
+        this.y = y;
+        this.value = value;
+        this.category = category;
+        this.color = color;
     }
 
     public Node(String id, String name, double symbolSize, double x, double y, double value, int category) {

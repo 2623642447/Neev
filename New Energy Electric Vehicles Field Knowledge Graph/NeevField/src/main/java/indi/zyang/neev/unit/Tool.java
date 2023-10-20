@@ -45,15 +45,17 @@ public class Tool {
         return node;
     }
 
+
+
     /**
       * @Author Zyang
-      * @Desctription TODO 制造节点且具有Node特性
+      * @Desctription TODO 制造节点且具有Node特性, update20231008新增颜色属性
       * @Date 2023/6/4 17:53
       * @Param [nodeId, nodeName, category]
       * @return indi.zyang.neev.unit.Node
       */
-    public static Node buildNodeWithFeature(String nodeId, String nodeName, int category, int size){
-        Node node = new Node(nodeId, nodeName, size, 142.43670600000002, 0.9626298999999999, 20.457146, category);
+    public static Node buildNodeWithFeature(String nodeId, String nodeName, int category, int size, String color){
+        Node node = new Node(nodeId, nodeName, size, 142.43670600000002, 0.9626298999999999, 20.457146, category, color);
         return node;
     }
 

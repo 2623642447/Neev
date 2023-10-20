@@ -1,8 +1,12 @@
+// import * as THREE from "three";
+// import { CSS2DRenderer,CSS2DObject  } from 'three/addons/renderers/CSS2DRenderer.js';
+
 let item = window.localStorage.getItem("item");
 let id = window.localStorage.getItem("id");
 let path = "/" + item + "/" + id;
 let dom = document.querySelector("#container");
 let myChart = echarts.init(dom);
+// let myChart1 = echarts.init(document.getElementById('content'),'light');
 let graphData;
 let append = false;//是否为追加模式
 let cube = false;//是否为3D模式
@@ -375,9 +379,9 @@ function graph(){
                     fontStyle: 'normal',
                     fontSize: 16
                 },
-                force: {
-                    repulsion: 150
-                },
+                // force: {
+                //     repulsion: 150
+                // },
                 lineStyle:{
                     width: 1
                 },
@@ -429,69 +433,113 @@ let Graph;
 function graph3d(gData, idx){
     //hiddenLoading3D();
     const elem = document.getElementById('container_3d');
+    // let CSS2DRendererItem= new CSS2DRenderer();
+    // Graph = ForceGraph3D({
+    //     extraRenderers: [CSS2DRendererItem],
+    // })
     Graph = ForceGraph3D()
     (elem)
-        .nodeLabel(node => {
-            let type = getCategoryName(node.group);
-            return type + "：" + node.name;
-        })
-        .linkLabel((link)=>{//鼠标移上连线展示信息
-            let label = "关系：" + link.val;
-            return label;
-        })
+        .dagMode('bu')
+        .dagLevelDistance(100)
+        .nodeRelSize(10)
         .nodeColor(node => {
-            return colors[node.group]
+            if (node.name=="新能源汽车"){
+                return colors[0]
+            }
+            //ind20005
+            if (node.id.substring(3)>=20005 && node.id.substring(3)<=20010){
+                return colors[1]
+            }
+            if (node.id.substring(3)==20091){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20061 && node.id.substring(3)<=20064){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20070 && node.id.substring(3)<=20090 && node.id.substring(3)!=20072){
+                return colors[1]
+            }
+            if (node.id.substring(3)==20025){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20016 && node.id.substring(3)<=20022){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20043 && node.id.substring(3)<=20055){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20034 && node.id.substring(3)<=20038){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20061 && node.id.substring(3)<=20064){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20054 && node.id.substring(3)<=20056){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20068 && node.id.substring(3)<=20069){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20043 && node.id.substring(3)<=20047){
+                return colors[1]
+            }
+            if (node.id.substring(3)>=20028 && node.id.substring(3)<=20031){
+                return colors[1]
+            }
+            else return colors[2]
         })
-        // .nodeAutoColorBy('group')
-        .linkAutoColorBy(d => {
-            return findNodeGroupByTarget(gData.nodes, d.target);
-        })
-        .graphData(gData)
         // .backgroundColor('rgba(255,255,255,1.0)')
         .nodeThreeObject(node=>{
-            return this.addSpriteText(node);
+            return addSpriteText(node);
         })
         .nodeThreeObjectExtend((node=>{
             return true
         }))
-        .linkThreeObjectExtend(true)
-        .linkWidth(0.75)
-        // .linkThreeObject(link => {
-        //     const sprite = new SpriteText(`${link.val}`);
-        //     sprite.color = link.color;
-        //     sprite.textHeight = 2.5;
-        //     return sprite;
+
+        // .nodeCanvasObjectMode(() => 'after')
+        // .nodeCanvasObject((node, ctx) => {
+        //     const label = node.name;
+        //     const fontSize = 15;
+        //     ctx.font = `${fontSize}px Sans-Serif`;
+        //     const textWidth = ctx.measureText(label).width;
+        //     const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+        //
+        //     ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        //     ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
         // })
-        // .linkPositionUpdate((sprite, { start, end }) => {
-        //     const middlePos = Object.assign(...['x', 'y', 'z'].map(c => ({
-        //         [c]: start[c] + (end[c] - start[c]) / 2 // calc middle point
-        //     })));
-        //     Object.assign(sprite.position, middlePos);
+
+        .nodeLabel(node => `<div class='node-label2'>${node.name}</div>`)
+        .linkLabel((link)=>{//鼠标移上连线展示信息
+            let label = "关系：" + link.val;
+            return label;
+        })
+        // .linkAutoColorBy(d => {
+        //     return findNodeGroupByTarget(gData.nodes, d.target);
         // })
-        .width($("#container").width())
-        .height($("#container").height())
+        .linkColor("#68b344")
         .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
         .onNodeClick(node => {
-            moveCamera(node);
-            clickNode = node;
-            let pojoItem = node.id.substring(0,1);
-            if (pojoItem == "g"){
-                let geographyName = node.name;
-                overlayer(geographyName);
-                $(".geography-layer").css("height", "100%");
-            }else {
-                if (!fix){//如果不是固定模式
-                    //loading3D("数据获取中");
-                    let nId = node.id.match(/[0-9]+/g);
-                    let itemChar = node.id.match(/[a-z]+/ig);
-                    let item = getEnglishCategoryNameByChar(itemChar[0]);
-                    let sendPath = "/" + item + "/" + nId;
-                    getData(sendPath);
-                }
-            }
-        });
-    Graph.numDimensions(idx);
-    Graph.d3Force('charge').strength(-100);
+            dataHisEchartsByClick(node.name);
+        })
+        .onNodeRightClick(node => {
+
+        })
+        .linkWidth(1)
+        .width($("#container").width())
+        .height($("#container").height())
+        .graphData(gData)
+        .d3Force('collision', d3.forceCollide(node => Graph.nodeRelSize()+5));
+    Graph.numDimensions(2);
+    // Graph.nodeThreeObject(node => {
+    //         const nodeEl = document.createElement("div");
+    //         nodeEl.textContent = node.name;
+    //         nodeEl.style.color = "#68b344";
+    //         nodeEl.className = 'node-label';
+    //         return new CSS2DObject(nodeEl);
+    //     });
+    // Graph.nodeThreeObjectExtend(true);
+    // Graph.d3Force('charge').strength(-200);
+    Graph.dagLevelDistance(75);
 }
 
 function find3DNodeBySId(sid) {
@@ -520,7 +568,7 @@ function moveCamera(node) {
 function addSpriteText(node){
     const sprite = new SpriteText(node.name);
     sprite.color = '#fff';
-    sprite.textHeight = 3;
+    sprite.textHeight = 8;
     sprite.position.set(0,12,0);
     return sprite;
 }
@@ -567,7 +615,8 @@ function companyInfo(data) {
 function industryInfo(data) {
     let content = ``;
     let indName = data.indName;
-    let desContent = data.description.desContent;
+    // let desContent = data.description.desContent;
+    let desContent = "";
     if (desContent.length == 0){
         content = content + `<div>
                                 <div class="title">产业名称</div>
@@ -578,11 +627,14 @@ function industryInfo(data) {
         content = content + `<div>
                                 <div class="title">产业名称</div>
                                 <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>                      
-                                <div class="content">${desContent}</div>    
+                                <div class="content">
+                                ${desContent}</div>
+                                销售趋势图
                             </div>`;
     }
 
     $("#info").html(content);
+    dataHisEcharts();
     fold();
 }
 
@@ -1067,4 +1119,181 @@ function fold() {
             }
         })
     }
+}
+
+var option;
+function dataHisEcharts(){
+    var chartDom = document.getElementById('info');
+    var myChart1 = echarts.init(chartDom);
+    var option;
+
+    let base = +new Date(2012, 1, 1);
+    let oneDay = 24 * 3600 * 1000;
+    let date = [];
+    let data = [Math.random() * 300];
+    for (let i = 1; i < 4000; i++) {
+        var now = new Date((base += oneDay));
+        date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+        var randomData = (Math.random() - 0.5) * 20 + data[i - 1];
+        if ( randomData > 0){
+            data.push(randomData);
+        }else{
+            data.push(0-randomData);
+        }
+    }
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            position: function (pt) {
+                return [pt[0], '10%'];
+            }
+        },
+        title: {
+            left: 'center',
+            text: '新能源汽车销量趋势图'
+        },
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: date
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%']
+        },
+        dataZoom: [
+            {
+                type: 'inside',
+                start: 0,
+                end: 10
+            },
+            {
+                start: 0,
+                end: 10
+            }
+        ],
+        series: [
+            {
+                name: 'Data',
+                type: 'line',
+                symbol: 'none',
+                sampling: 'lttb',
+                itemStyle: {
+                    color: 'rgb(255, 70, 131)'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgb(255, 158, 68)'
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgb(255, 70, 131)'
+                        }
+                    ])
+                },
+                data: data
+            }
+        ]
+    };
+
+    option && myChart1.setOption(option);
+}
+
+function dataHisEchartsByClick(name){
+    var chartDom = document.getElementById('info');
+    var myChart1 = echarts.init(chartDom);
+    var option;
+
+    let base = +new Date(2012, 1, 1);
+    let oneDay = 24 * 3600 * 1000;
+    let date = [];
+    let data = [Math.random() * 300];
+    for (let i = 1; i < 4000; i++) {
+        var now = new Date((base += oneDay));
+        date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
+        var randomData = (Math.random() - 0.5) * 20 + data[i - 1];
+        if ( randomData > 0){
+            data.push(randomData);
+        }else{
+            data.push(0-randomData);
+        }
+    }
+    option = {
+        tooltip: {
+            trigger: 'axis',
+            position: function (pt) {
+                return [pt[0], '10%'];
+            }
+        },
+        title: {
+            left: 'center',
+            text: name+'趋势图'
+        },
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: date
+        },
+        yAxis: {
+            type: 'value',
+            boundaryGap: [0, '100%']
+        },
+        dataZoom: [
+            {
+                type: 'inside',
+                start: 0,
+                end: 10
+            },
+            {
+                start: 0,
+                end: 10
+            }
+        ],
+        series: [
+            {
+                name: 'Data',
+                type: 'line',
+                symbol: 'none',
+                sampling: 'lttb',
+                itemStyle: {
+                    color: 'rgb(255, 70, 131)'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgb(255, 158, 68)'
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgb(255, 70, 131)'
+                        }
+                    ])
+                },
+                data: data
+            }
+        ]
+    };
+
+    option && myChart1.setOption(option);
 }
