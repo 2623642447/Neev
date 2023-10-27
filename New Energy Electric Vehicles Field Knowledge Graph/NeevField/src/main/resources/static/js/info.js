@@ -64,7 +64,6 @@ changModeDom.addEventListener("click", function () {
 
         $("#info").css("background-color", "#000011");
         $("#info").removeClass("info2d");
-        $("#info").addClass("info3d");
         $("main").css("background-color", "#000011");
 
         cube = true;
@@ -529,7 +528,7 @@ function graph3d(gData, idx){
         .height($("#container").height())
         .graphData(gData)
         .d3Force('collision', d3.forceCollide(node => Graph.nodeRelSize()+5));
-    Graph.numDimensions(2);
+    Graph.numDimensions(3);
     // Graph.nodeThreeObject(node => {
     //         const nodeEl = document.createElement("div");
     //         nodeEl.textContent = node.name;
@@ -1123,7 +1122,12 @@ function fold() {
 
 var option;
 function dataHisEcharts(){
-    var chartDom = document.getElementById('info');
+    var infoBox = document.getElementById('info');
+    var chartDom = document.createElement("div");
+    chartDom.style.height = "70%"
+    chartDom.style.width = "100%"
+
+    infoBox.appendChild(chartDom)
     var myChart1 = echarts.init(chartDom);
     var option;
 
