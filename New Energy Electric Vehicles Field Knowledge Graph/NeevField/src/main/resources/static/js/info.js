@@ -297,123 +297,144 @@ function getRelationByChar(source, target) {
 
 function graph(){
     myChart.hideLoading();
-    let graph = graphData;
-    graph.nodes.forEach(function (node) {
-        node.itemStyle = null;
-        // node.symbolSize = 18;
-        node.value = node.symbolSize;
-        node.x = node.y = null;
-        node.draggable = true;
-    });
-    option = {
-        title: {
-            text: '',
-            subtext: '',
-            top: 'bottom',
-            left: 'right'
-        },
-        tooltip: {
-            formatter: function (params, ticket, callback) {
-                if (params.dataType == "node") {
-                    let category = params.data.category;
-                    let categoryName = getCategoryName(category);
-                    let name = params.name;
-                    let tip = `<div class="hidden-text">
-                                    <span class="point" style="background: ${colors[category]}"></span>
-                                    <span class="tip-text">${categoryName}：${name}</span>
-                               </div>`
-                    return tip;
-                }else if (params.dataType == "edge"){
-                    let sourceNode = getNodeByNodeId(graph.nodes, params.data.source);
-                    let targetNode = getNodeByNodeId(graph.nodes, params.data.target);
-                    let relation = getRelation(sourceNode, targetNode, true);
-                    return relation;
+    const app = new Vue({
+        name: 'RelationGraphDemo',
+        components: { },
+        data() {
+            return {
+                g_loading: true,
+                demoname: '---',
+                graphOptions: {
+                    'layouts': [
+                        {
+                            'label': '中心',
+                            'layoutName': 'tree',
+                            'layoutClassName': 'seeks-layout-center',
+                            'defaultJunctionPoint': 'border',
+                            'defaultNodeShape': 0,
+                            'defaultLineShape': 1,
+                            'from': 'left',
+                            'max_per_width': '300',
+                            'min_per_height': '40'
+                        }
+                    ],
+                    'defaultLineMarker': {
+                        'markerWidth': 12,
+                        'markerHeight': 12,
+                        'refX': 6,
+                        'refY': 6,
+                        'data': 'M2,2 L10,6 L2,10 L6,6 L2,2'
+                    },
+                    moveToCenterWhenRefresh: false,
+                    'defaultExpandHolderPosition': 'right',
+                    'defaultNodeShape': 1,
+                    'defaultNodeWidth': '100',
+                    'defaultLineShape': 4,
+                    'defaultJunctionPoint': 'lr',
+                    'defaultNodeBorderWidth': 0,
+                    'defaultLineColor': 'rgba(0, 186, 189, 1)',
+                    'defaultNodeColor': 'rgba(0, 206, 209, 1)'
                 }
-            }
+            };
         },
-        // toolbox: {
-        //     feature: {
-        //         saveAsImage: {
-        //             width: 30,
-        //             height: 30
-        //         }
-        //     },
-        //     right: 50,
-        //     bottom: 10
-        // },
-        color: colors,
-        legend: [
-            {
-                type: 'scroll',
-                orient: 'vertical',
-                right: 10,
-                top: 20,
-                bottom: 20,
-                selectedMode: false,
-                textStyle:{
-                    fontSize: 16,
-                    lineHeight: 18
-                },
-                data: graph.categories.map(function (a) {
-                    return a.name;
-                })
-            }
-        ],
-        backgroundColor: '#fff',
-        animation: false,
-        series : [
-            {
-                name: '',
-                type: 'graph',
-                layout: 'force',
-                data: graph.nodes,
-                edges: graph.links,
-                categories: graph.categories,
-                animation: false,
-                roam: true,
-                zoom: 2,
-                label: {
-                    show: true,
-                    position: 'right',
-                    fontStyle: 'normal',
-                    fontSize: 16
-                },
-                // force: {
-                //     repulsion: 150
-                // },
-                lineStyle:{
-                    width: 1
-                },
-                force: {
-                    repulsion: 200//节点之间的斥力因子。值越大则斥力越大
-                }
-            }
-        ]
-    };
+        created() {
+        },
+        mounted() {
+            this.demoname = this.$route.params.demoname;
+            this.setGraphData();
+        },
+        methods: {
+            setGraphData() {
+                // 使用要点：通过节点属性expandHolderPosition: 'right' 和 expanded: false 可以让节点在没有子节点的情况下展示一个"展开"按钮
+                //         通过onNodeExpand事件监听节点，在被展开的时候有选择的去从后台获取数据，如果已经从后台加载过数据，则让当前图谱根据当前的节点重新布局
+                const __graph_json_data = {
+                    'rootId': 'a',
+                    'nodes': [
+                        { 'id': 'a', 'text': 'a' },
+                        { 'id': 'b', 'text': 'b-固定数据展开/关闭' },
+                        { 'id': 'b1', 'text': 'b1' },
+                        { 'id': 'b1-1', 'text': 'b1-1' },
+                        { 'id': 'b1-2', 'text': 'b1-2' },
+                        { 'id': 'b1-3', 'text': 'b1-3' },
+                        { 'id': 'b1-4', 'text': 'b1-4' },
+                        { 'id': 'b1-5', 'text': 'b1-5' },
+                        { 'id': 'b1-6', 'text': 'b1-6' },
+                        { 'id': 'b2', 'text': 'b2' },
+                        { 'id': 'b2-1', 'text': 'b2-1' },
+                        { 'id': 'b2-2', 'text': 'b2-2' },
+                        { 'id': 'c', 'text': 'c-动态数据展开/关闭' },
+                        { 'id': 'c1', 'text': 'c1-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }},
+                        { 'id': 'c2', 'text': 'c2-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }},
+                        { 'id': 'c3', 'text': 'c3-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }}],
+                    'lines': [
+                        { 'from': 'a', 'to': 'b' },
+                        { 'from': 'b', 'to': 'b1' },
+                        { 'from': 'b1', 'to': 'b1-1' },
+                        { 'from': 'b1', 'to': 'b1-2' },
+                        { 'from': 'b1', 'to': 'b1-3' },
+                        { 'from': 'b1', 'to': 'b1-4' },
+                        { 'from': 'b1', 'to': 'b1-5' },
+                        { 'from': 'b1', 'to': 'b1-6' },
+                        { 'from': 'b', 'to': 'b2' },
+                        { 'from': 'b2', 'to': 'b2-1' },
+                        { 'from': 'b2', 'to': 'b2-2' },
+                        { 'from': 'a', 'to': 'c' },
+                        { 'from': 'c', 'to': 'c1' },
+                        { 'from': 'c', 'to': 'c2' },
+                        { 'from': 'c', 'to': 'c3' }]
+                };
 
-    myChart.setOption(option, false);
-    myChart.on('click', function (params) {
-        if(params.dataType === 'node'){
-            let pojoItem = params.data.id.substring(0, 1);
-            if (pojoItem == "g"){
-                let geographyName = params.data.name;
-                overlayer(geographyName);
-                $(".geography-layer").css("height", "100%");
-            }else {
-                if(!fix){
-                    myChart.showLoading();
-                    let nId = params.data.id.match(/[0-9]+/g);
-                    let itemChar = params.data.id.match(/[a-z]+/ig);
-                    let item = getEnglishCategoryNameByChar(itemChar[0]);
-                    // todo 后期删除此逻辑分支
-                    if(item == "industry"){
-                        let sendPath = "/" + item + "/append/" + nId;
-                        getData(sendPath);
-                    }else{
-                        let sendPath = "/" + item + "/" + nId;
-                        getData(sendPath);
-                    }
+                console.log(JSON.stringify(__graph_json_data));
+                setTimeout(() => {
+                    this.g_loading = false;
+                    this.$refs.graphRef.setJsonData(__graph_json_data, (graphInstance) => {
+                        // 这些写上当图谱初始化完成后需要执行的代码
+                    });
+                }, 1000);
+            },
+            onNodeCollapse(node, e) {
+                this.$refs.graphRef.refresh();
+            },
+            // 通过onNodeExpand事件监听节点的展开事件，在被展开的时候有选择的去从后台获取数据，如果已经从后台加载过数据，则让当前图谱根据当前的节点重新布局
+            onNodeExpand(node, e) {
+                console.log('onNodeExpand:', node);
+                // 根据具体的业务需要决定是否需要从后台加载数据
+                if (!node.data.isNeedLoadDataFromRemoteServer) {
+                    console.log('这个节点的子节点已经加载过了');
+                    this.$refs.graphRef.refresh();
+                    return;
                 }
+                // 判断是否已经动态加载数据了
+                if (node.data.childrenLoaded) {
+                    console.log('这个节点的子节点已经加载过了');
+                    this.$refs.graphRef.refresh();
+                    return;
+                }
+                this.g_loading = true;
+                node.data.childrenLoaded = true;
+                this.loadChildNodesFromRemoteServer(node, new_data => {
+                    this.g_loading = false;
+                    this.$refs.graphRef.getInstance().appendJsonData(new_data, (graphInstance) => {
+                        // 这些写上当图谱初始化完成后需要执行的代码
+                    });
+                });
+            },
+            loadChildNodesFromRemoteServer(node, callback) {
+                setTimeout(function() {
+                    const _new_json_data = {
+                        nodes: [
+                            { id: node.id + '-child-1', text: node.id + '-的动态子节点1', width: 150 },
+                            { id: node.id + '-child-2', text: node.id + '-的动态子节点2', width: 150 },
+                            { id: node.id + '-child-3', text: node.id + '-的动态子节点3', width: 150 }
+                        ],
+                        lines: [
+                            { from: node.id, to: node.id + '-child-1', text: '动态子节点' },
+                            { from: node.id, to: node.id + '-child-2', text: '动态子节点' },
+                            { from: node.id, to: node.id + '-child-3', text: '动态子节点' }
+                        ]
+                    };
+                    callback(_new_json_data);
+                }, 1000);
             }
         }
     });
