@@ -3,6 +3,9 @@ package indi.zyang.neev.service;
 import indi.zyang.neev.entity.Industry;
 import indi.zyang.neev.unit.GraphData;
 
+import java.util.HashMap;
+import java.util.List;
+
 public interface IndustryService {
     /**
       * @Author Zyang
@@ -39,4 +42,22 @@ public interface IndustryService {
      * @return indi.zyang.neev.unit.GraphData
      */
     GraphData getEChartGraphData();
+
+    /**
+      * @Author Zyang
+      * @Desctription 构建RelationGraph关系图所需要的nodes list,无参方法
+      * @Date 2023/10/28 14:18
+      * @Param []
+      * @return java.util.List<java.util.HashMap<java.lang.String,java.lang.String>>
+      */
+    List<HashMap<String,String>> getRelationGraphNodes();
+
+    /**
+      * @Author Zyang
+      * @Desctription 构建RelationGraph关系图所需要的lines list,无参方法
+      * @Date 2023/10/28 14:29
+      * @Param []
+      * @return java.util.List<java.util.HashMap<java.lang.String,java.lang.String>>
+      */
+    List<HashMap<String,String>> getRelationGraphLines();
 }

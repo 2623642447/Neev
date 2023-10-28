@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -21,9 +23,14 @@ public class IndustryController {
     @RequestMapping("/{id}")
     @ResponseBody
     public Map<String, Object> getIndustryInfo(@PathVariable("id") int indId){
+//        Industry industry = industryService.findFullIndustryByIndId(indId);
+//        GraphData data = industryService.getEChartGraphData();
+//        return Tool.formatData(industry,data,"industry");
         Industry industry = industryService.findFullIndustryByIndId(indId);
         GraphData data = industryService.getEChartGraphData();
-        return Tool.formatData(industry,data,"industry");
+        List<HashMap<String,String>> relationGraphNodesList = industryService.getRelationGraphNodes();
+        List<HashMap<String,String>> relationGraphLinesList = industryService.getRelationGraphLines();
+        return Tool.formatNewData(industry,data,"industry",relationGraphNodesList,relationGraphLinesList);
     }
 
     //todo 解决append传入id情况
@@ -33,5 +40,15 @@ public class IndustryController {
         Industry industry = industryService.findFullIndustryByIndId(indId);
         GraphData data = industryService.getEChartGraphData(industry);
         return Tool.formatData(industry,data,"industry");
+    }
+
+    @RequestMapping(value = "/neev")
+    @ResponseBody
+    public Map<String, Object> neevIndustry(){
+        Industry industry = industryService.findFullIndustryByIndId(20001);
+        GraphData data = industryService.getEChartGraphData(industry);
+        List<HashMap<String,String>> relationGraphNodesList = industryService.getRelationGraphNodes();
+        List<HashMap<String,String>> relationGraphLinesList = industryService.getRelationGraphLines();
+        return Tool.formatNewData(industry,data,"industry",relationGraphNodesList,relationGraphLinesList);
     }
 }

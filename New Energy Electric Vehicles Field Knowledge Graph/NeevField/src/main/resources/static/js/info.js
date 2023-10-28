@@ -1,6 +1,3 @@
-// import * as THREE from "three";
-// import { CSS2DRenderer,CSS2DObject  } from 'three/addons/renderers/CSS2DRenderer.js';
-
 let item = window.localStorage.getItem("item");
 let id = window.localStorage.getItem("id");
 let path = "/" + item + "/" + id;
@@ -47,6 +44,8 @@ changModeDom.addEventListener("click", function () {
         $("#change_mode").css("background-image", 'url("/images/3d.svg")');
         $("#container_3d").css("width", "0px");
         $("#container_3d").css("height", "0px");
+        $("#app").css("width", "100%");
+        $("#app").css("height", "100%");
         $("#category_3d").css("display", "none");
 
         $("#info").css("background-color", "#fff");
@@ -60,9 +59,12 @@ changModeDom.addEventListener("click", function () {
         $("#change_mode").css("background-image", 'url("/images/2d.svg")');
         $("#container_3d").css("width", "100%");
         $("#container_3d").css("height", "100%");
+        $("#app").css("width", "0px");
+        $("#app").css("height", "0px");
         $("#category_3d").css("display", "block");
 
         $("#info").css("background-color", "#000011");
+        $("#info").addClass("info3d");
         $("#info").removeClass("info2d");
         $("main").css("background-color", "#000011");
 
@@ -88,14 +90,14 @@ function getData(sendPath) {
         url: sendPath,
         type: "GET",
         dataType: "json",
-        success: function (data) {
+        success: function (jsonData) {
             update = true;
-            updateInfo(data.item, data.info);
+            updateInfo(jsonData.item, jsonData.info);
             if (append){
-                appendData(data.graphData);
+                appendData(jsonData.graphData);
             }else {
-                graphData = data.graphData;
-                graph();
+                graphData = jsonData.graphData;
+                graph(jsonData.relationGraphData);
             }
             gData = changeData3D(graphData);
             graph3d(gData, 3);
@@ -295,9 +297,11 @@ function getRelationByChar(source, target) {
     }
 }
 
-function graph(){
+function graph(relationGraphData){
     myChart.hideLoading();
+
     const app = new Vue({
+        el : '#app',
         name: 'RelationGraphDemo',
         components: { },
         data() {
@@ -340,49 +344,14 @@ function graph(){
         created() {
         },
         mounted() {
-            this.demoname = this.$route.params.demoname;
+            // this.demoname = this.$route.params.demoname;
             this.setGraphData();
         },
         methods: {
             setGraphData() {
                 // 使用要点：通过节点属性expandHolderPosition: 'right' 和 expanded: false 可以让节点在没有子节点的情况下展示一个"展开"按钮
                 //         通过onNodeExpand事件监听节点，在被展开的时候有选择的去从后台获取数据，如果已经从后台加载过数据，则让当前图谱根据当前的节点重新布局
-                const __graph_json_data = {
-                    'rootId': 'a',
-                    'nodes': [
-                        { 'id': 'a', 'text': 'a' },
-                        { 'id': 'b', 'text': 'b-固定数据展开/关闭' },
-                        { 'id': 'b1', 'text': 'b1' },
-                        { 'id': 'b1-1', 'text': 'b1-1' },
-                        { 'id': 'b1-2', 'text': 'b1-2' },
-                        { 'id': 'b1-3', 'text': 'b1-3' },
-                        { 'id': 'b1-4', 'text': 'b1-4' },
-                        { 'id': 'b1-5', 'text': 'b1-5' },
-                        { 'id': 'b1-6', 'text': 'b1-6' },
-                        { 'id': 'b2', 'text': 'b2' },
-                        { 'id': 'b2-1', 'text': 'b2-1' },
-                        { 'id': 'b2-2', 'text': 'b2-2' },
-                        { 'id': 'c', 'text': 'c-动态数据展开/关闭' },
-                        { 'id': 'c1', 'text': 'c1-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }},
-                        { 'id': 'c2', 'text': 'c2-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }},
-                        { 'id': 'c3', 'text': 'c3-动态获取子节点', expandHolderPosition: 'right', expanded: false, data: { isNeedLoadDataFromRemoteServer: true, childrenLoaded: false }}],
-                    'lines': [
-                        { 'from': 'a', 'to': 'b' },
-                        { 'from': 'b', 'to': 'b1' },
-                        { 'from': 'b1', 'to': 'b1-1' },
-                        { 'from': 'b1', 'to': 'b1-2' },
-                        { 'from': 'b1', 'to': 'b1-3' },
-                        { 'from': 'b1', 'to': 'b1-4' },
-                        { 'from': 'b1', 'to': 'b1-5' },
-                        { 'from': 'b1', 'to': 'b1-6' },
-                        { 'from': 'b', 'to': 'b2' },
-                        { 'from': 'b2', 'to': 'b2-1' },
-                        { 'from': 'b2', 'to': 'b2-2' },
-                        { 'from': 'a', 'to': 'c' },
-                        { 'from': 'c', 'to': 'c1' },
-                        { 'from': 'c', 'to': 'c2' },
-                        { 'from': 'c', 'to': 'c3' }]
-                };
+                const __graph_json_data = relationGraphData;
 
                 console.log(JSON.stringify(__graph_json_data));
                 setTimeout(() => {
@@ -453,10 +422,6 @@ let Graph;
 function graph3d(gData, idx){
     //hiddenLoading3D();
     const elem = document.getElementById('container_3d');
-    // let CSS2DRendererItem= new CSS2DRenderer();
-    // Graph = ForceGraph3D({
-    //     extraRenderers: [CSS2DRendererItem],
-    // })
     Graph = ForceGraph3D()
     (elem)
         .dagMode('bu')
@@ -516,18 +481,6 @@ function graph3d(gData, idx){
             return true
         }))
 
-        // .nodeCanvasObjectMode(() => 'after')
-        // .nodeCanvasObject((node, ctx) => {
-        //     const label = node.name;
-        //     const fontSize = 15;
-        //     ctx.font = `${fontSize}px Sans-Serif`;
-        //     const textWidth = ctx.measureText(label).width;
-        //     const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
-        //
-        //     ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-        //     ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
-        // })
-
         .nodeLabel(node => `<div class='node-label2'>${node.name}</div>`)
         .linkLabel((link)=>{//鼠标移上连线展示信息
             let label = "关系：" + link.val;
@@ -549,7 +502,7 @@ function graph3d(gData, idx){
         .height($("#container").height())
         .graphData(gData)
         .d3Force('collision', d3.forceCollide(node => Graph.nodeRelSize()+5));
-    Graph.numDimensions(3);
+    Graph.numDimensions(idx);
     // Graph.nodeThreeObject(node => {
     //         const nodeEl = document.createElement("div");
     //         nodeEl.textContent = node.name;

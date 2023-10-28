@@ -15,6 +15,11 @@
         <div id="info" class="info2d">
         </div>
         <div id="graph_canvas">
+            <div id="app">
+                <div style="height:calc(100vh - 30px);width:100%;border:#eeeeee solid 1px;">
+                    <relation-graph ref="graphRef" :options="graphOptions" :on-node-expand="onNodeExpand" :on-node-collapse="onNodeCollapse"/>
+                </div>
+            </div>
             <div id="container"></div>
             <div id="container_3d"></div>
             <div id="graph_mode">
@@ -59,14 +64,6 @@
         <div class="turn-off"></div>
     </div>
 
-<!--    <script type="importmap" >-->
-<!--      {-->
-<!--        "imports": {-->
-<!--          "three": "https://unpkg.com/three@0.149.0/build/three.module.js",-->
-<!--          "three/addons/": "https://unpkg.com/three@0.149.0/examples/jsm/"-->
-<!--        }-->
-<!--      }-->
-<!--    </script>-->
     <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script type="text/javascript" src="/js/echarts.min.js"></script>
     <script type="text/javascript" src="/js/dataTool.min.js"></script>
@@ -74,18 +71,21 @@
     <script type="text/javascript" src="/js/three-spritetext.js"></script>
     <script type="text/javascript" src="/js/3d-force-graph.js"></script>
     <script type="text/javascript" src="/js/force-graph.js"></script>
-    <script type="text/javascript" src="//unpkg.com/d3-dsv"></script>
-    <script type="text/javascript" src="//unpkg.com/d3-quadtree"></script>
-    <script type="text/javascript" src="//unpkg.com/d3-force"></script>
+    <script type="text/javascript" src="/js/d3-dsv.min.js"></script>
+    <script type="text/javascript" src="/js/d3-quadtree.min.js"></script>
+    <script type="text/javascript" src="/js/d3-force.min.js"></script>
 
     <script type="text/javascript" src="/js/map.js"></script>
     <script type="text/javascript" src="/js/fieldMap.js"></script>
+
+    <script src="/js/screenfull.min.js"></script>
+    <script src="/js/html2canvas.min.js"></script>
+    <script src="/js/vue@2"></script>
+    <!-- 引入relation-graph -->
+    <script src="/js/relation-graph.umd.js"></script>
+
     <script type="module" src="/js/info.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/screenfull.js/5.1.0/screenfull.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-    <!-- 引入relation-graph -->
-    <script src="https://unpkg.com/relation-graph/lib/vue2/relation-graph.umd.js"></script>
 </body>
+
 </html>

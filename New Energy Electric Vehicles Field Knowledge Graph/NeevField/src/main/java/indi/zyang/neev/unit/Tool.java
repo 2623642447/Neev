@@ -17,6 +17,19 @@ public class Tool {
         return data;
     }
 
+    public static Map<String, Object> formatNewData(Object info, GraphData graphData, String item,List nodes,List Lines){
+        Map<String, Object> data = new HashMap<>();
+        data.put("info", info);
+        data.put("graphData", graphData);
+        data.put("item", item);
+        Map<String, Object> relationGraphData = new HashMap<>();
+        relationGraphData.put("rootId", "10001");
+        relationGraphData.put("nodes",nodes);
+        relationGraphData.put("lines",Lines);
+        data.put("relationGraphData",relationGraphData);
+        return data;
+    }
+
 //    public static Map<String, Object> formatSearchResult(List<Prescription> prescriptionList, List<Herb> herbList, List<Disease> diseaseList, List<Book> bookList, List<Geography> geographyList, List<HerbInfo> herbInfoList){
 //        Map<String, Object> data = new HashMap<>();
 //        data.put("prescription", prescriptionList);

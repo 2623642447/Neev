@@ -91,6 +91,47 @@ public class IndustryServiceImpl implements IndustryService {
         return data;
     }
 
+    @Override
+    public List<HashMap<String,String>> getRelationGraphNodes(){
+        List<HashMap<String,String>> relationGraphNodesList = new ArrayList<>();
+        List<Industry> industryList = industryMapper.findAllIndustry();
+        //遍历industryList将industry entity中的indId和IndName装入
+        for (Industry industryNode : industryList){
+            HashMap<String,String> relationGraphNodeMap = new HashMap<>();
+            String id = industryNode.getStringIndId();
+            String text = industryNode.getIndName();
+            relationGraphNodeMap.put("id", id);
+            relationGraphNodeMap.put("text",text);
+            relationGraphNodesList.add(relationGraphNodeMap);
+        }
+        return relationGraphNodesList;
+    }
+
+    @Override
+    public List<HashMap<String,String>> getRelationGraphLines(){
+        List<HashMap<String,String>> relationGraphLinesList = new ArrayList<>();
+        List<Industry> industryList = industryMapper.findAllIndustry();
+        for (Industry industry : industryList){
+            for (Industry upIndustry : industryList){
+                if(industry.getIndLevel()+1 == upIndustry.getIndLevel()){
+                    if (industry.getUpLevelKey() == upIndustry.getLevelKey()){
+                        industry.getUpIndustryList().add(upIndustry);
+                    }
+                }
+            }
+            //build Edges
+            for (Industry upIndustry : industry.getUpIndustryList()){
+                HashMap<String,String> relationGraphLineMap = new HashMap<>();
+                String to = upIndustry.getStringIndId();
+                String from = industry.getStringIndId();
+                relationGraphLineMap.put("from",from);
+                relationGraphLineMap.put("to",to);
+                relationGraphLinesList.add(relationGraphLineMap);
+            }
+        }
+        return relationGraphLinesList;
+    }
+
     public Map<String, String[]> getPointHistorical(List<Point> dataList) {
         // 最终返回的集合
         Map<String, String[]> map = new HashMap<>();
