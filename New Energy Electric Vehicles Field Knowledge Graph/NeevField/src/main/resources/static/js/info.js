@@ -97,7 +97,7 @@ function getData(sendPath) {
                 appendData(jsonData.graphData);
             }else {
                 graphData = jsonData.graphData;
-                graph(jsonData.relationGraphData);
+                graph(jsonData.relationGraphData,jsonData.info);
             }
             gData = changeData3D(graphData);
             graph3d(gData, 3);
@@ -276,7 +276,7 @@ function getRelationByChar(source, target) {
     }
 }
 
-function graph(relationGraphData){
+function graph(relationGraphData,oldData){
     myChart.hideLoading();
 
     const app = new Vue({
@@ -285,8 +285,7 @@ function graph(relationGraphData){
         components: { },
         data() {
             return {
-                g_loading: true,
-                demoname: '---',
+                // g_loading: true,
                 graphOptions: {
                     'layouts': [
                         {
@@ -320,10 +319,9 @@ function graph(relationGraphData){
                 }
             };
         },
-        created() {
-        },
+        // created() {
+        // },
         mounted() {
-            // this.demoname = this.$route.params.demoname;
             this.setGraphData();
         },
         methods: {
@@ -331,61 +329,30 @@ function graph(relationGraphData){
                 // 使用要点：通过节点属性expandHolderPosition: 'right' 和 expanded: false 可以让节点在没有子节点的情况下展示一个"展开"按钮
                 //         通过onNodeExpand事件监听节点，在被展开的时候有选择的去从后台获取数据，如果已经从后台加载过数据，则让当前图谱根据当前的节点重新布局
                 const __graph_json_data = relationGraphData;
-
                 console.log(JSON.stringify(__graph_json_data));
-                setTimeout(() => {
-                    this.g_loading = false;
-                    this.$refs.graphRef.setJsonData(__graph_json_data, (graphInstance) => {
+                this.$refs.graphRef.setJsonData(__graph_json_data, (graphInstance) => {
                         // 这些写上当图谱初始化完成后需要执行的代码
-                    });
-                }, 1000);
-            },
-            onNodeCollapse(node, e) {
-                this.$refs.graphRef.refresh();
-            },
-            // 通过onNodeExpand事件监听节点的展开事件，在被展开的时候有选择的去从后台获取数据，如果已经从后台加载过数据，则让当前图谱根据当前的节点重新布局
-            onNodeExpand(node, e) {
-                console.log('onNodeExpand:', node);
-                // 根据具体的业务需要决定是否需要从后台加载数据
-                if (!node.data.isNeedLoadDataFromRemoteServer) {
-                    console.log('这个节点的子节点已经加载过了');
-                    this.$refs.graphRef.refresh();
-                    return;
-                }
-                // 判断是否已经动态加载数据了
-                if (node.data.childrenLoaded) {
-                    console.log('这个节点的子节点已经加载过了');
-                    this.$refs.graphRef.refresh();
-                    return;
-                }
-                this.g_loading = true;
-                node.data.childrenLoaded = true;
-                this.loadChildNodesFromRemoteServer(node, new_data => {
-                    this.g_loading = false;
-                    this.$refs.graphRef.getInstance().appendJsonData(new_data, (graphInstance) => {
-                        // 这些写上当图谱初始化完成后需要执行的代码
-                    });
                 });
             },
-            loadChildNodesFromRemoteServer(node, callback) {
-                setTimeout(function() {
-                    const _new_json_data = {
-                        nodes: [
-                            { id: node.id + '-child-1', text: node.id + '-的动态子节点1', width: 150 },
-                            { id: node.id + '-child-2', text: node.id + '-的动态子节点2', width: 150 },
-                            { id: node.id + '-child-3', text: node.id + '-的动态子节点3', width: 150 }
-                        ],
-                        lines: [
-                            { from: node.id, to: node.id + '-child-1', text: '动态子节点' },
-                            { from: node.id, to: node.id + '-child-2', text: '动态子节点' },
-                            { from: node.id, to: node.id + '-child-3', text: '动态子节点' }
-                        ]
-                    };
-                    callback(_new_json_data);
-                }, 1000);
+            onNodeCollapse(node, e) {
+                console.log('onNodeCollapse:', node);
+                this.$refs.graphRef.refresh();
+            },
+            // 通过onNodeExpand事件监听节点的展开事件
+            onNodeExpand(node, e) {
+                console.log('onNodeExpand:', node);
+                this.$refs.graphRef.refresh();
+            },
+            onNodeClick(node, e) {
+                console.log('onNodeClick:', node);
+                var newData = oldData;
+                newData.indId=node.id.substring(3);
+                newData.indName=node.text;
+                updateInfo("industry", newData);
             }
         }
-    });
+    }
+    );
 }
 
 function findNodeGroupByTarget(nodes, target) {
@@ -531,16 +498,18 @@ function updateInfo(item, data){
             companyInfo(data);
             break;
         case "industry":
-            industryInfo(data);
+            $.ajax({
+                url: "/industry/description/"+data.indId,
+                type: "GET",
+                dataType: "json",
+                success: function (jsonData) {
+                    industryInfo(jsonData,data);
+                }
+            });
             break;
         case "product":
             productInfo(data);
             break;
-        // case "herbInfo":
-        //     oneHerbInfo(data);
-        //     break;
-        // case "disease":
-        //     diseaseAndBookInfo(data, "disease");
     }
 }
 
@@ -564,29 +533,26 @@ function companyInfo(data) {
     fold();
 }
 
-function industryInfo(data) {
+function industryInfo(jsonData,data) {
+    let desContent = jsonData.content;
+    let desName = jsonData.desname;
+    let unit = jsonData.unit;
     let content = ``;
-    let indName = data.indName;
-    // let desContent = data.description.desContent;
-    let desContent = "";
-    if (desContent.length == 0){
+    if (desContent == null || desContent.length == 0){
         content = content + `<div>
                                 <div class="title">产业名称</div>
-                                <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>
+                                <div class="content location" data-sid="h${data.indId}">${data.indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>
                                 <div class="content">抱歉，数据库中暂未收录该产业的具体信息</div>
                             </div>`;
     }else {
         content = content + `<div>
                                 <div class="title">产业名称</div>
-                                <div class="content location" data-sid="h${data.indId}">${indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>                      
-                                <div class="content">
-                                ${desContent}</div>
-                                销售趋势图
+                                <div class="content location" data-sid="h${data.indId}">${data.indName}<span title="报错" class="error" data-type="industry" data-id="${data.indId}"></span></div>                      
+                                <div class="content">${desContent}</div>
                             </div>`;
     }
-
     $("#info").html(content);
-    dataHisEcharts();
+    dataHisEcharts(jsonData);
     fold();
 }
 
@@ -784,7 +750,7 @@ function fold() {
 }
 
 var option;
-function dataHisEcharts(){
+function dataHisEcharts(jsonData){
     var infoBox = document.getElementById('info');
     var chartDom = document.createElement("div");
     chartDom.style.height = "70%"
@@ -794,30 +760,20 @@ function dataHisEcharts(){
     var myChart1 = echarts.init(chartDom);
     var option;
 
-    let base = +new Date(2012, 1, 1);
-    let oneDay = 24 * 3600 * 1000;
-    let date = [];
-    let data = [Math.random() * 300];
-    for (let i = 1; i < 4000; i++) {
-        var now = new Date((base += oneDay));
-        date.push([now.getFullYear(), now.getMonth() + 1, now.getDate()].join('/'));
-        var randomData = (Math.random() - 0.5) * 20 + data[i - 1];
-        if ( randomData > 0){
-            data.push(randomData);
-        }else{
-            data.push(0-randomData);
-        }
-    }
+    var data = jsonData.echartData;
+    var date = jsonData.echartDate;
+    var desname = jsonData.desname;
+
     option = {
         tooltip: {
             trigger: 'axis',
             position: function (pt) {
-                return [pt[0], '10%'];
+                return [pt[0], '50%'];
             }
         },
         title: {
             left: 'center',
-            text: '新能源汽车销量趋势图'
+            text: desname
         },
         toolbox: {
             feature: {
@@ -896,6 +852,7 @@ function dataHisEchartsByClick(name){
             data.push(0-randomData);
         }
     }
+    var test;
     option = {
         tooltip: {
             trigger: 'axis',

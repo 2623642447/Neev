@@ -17,7 +17,7 @@
         <div id="graph_canvas">
             <div id="app">
                 <div style="height:calc(100vh - 30px);width:100%;border:#eeeeee solid 1px;">
-                    <relation-graph ref="graphRef" :options="graphOptions" :on-node-expand="onNodeExpand" :on-node-collapse="onNodeCollapse"/>
+                    <relation-graph ref="graphRef" :options="graphOptions" :on-node-expand="onNodeExpand" :on-node-collapse="onNodeCollapse" :on-node-click="onNodeClick"/>
                 </div>
             </div>
             <div id="container"></div>
