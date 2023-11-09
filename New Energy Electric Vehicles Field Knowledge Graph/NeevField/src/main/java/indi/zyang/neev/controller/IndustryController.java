@@ -1,6 +1,7 @@
 package indi.zyang.neev.controller;
 
 import indi.zyang.neev.entity.Industry;
+import indi.zyang.neev.service.DescriptionService;
 import indi.zyang.neev.service.IndustryService;
 import indi.zyang.neev.unit.GraphData;
 import indi.zyang.neev.unit.Tool;
@@ -20,12 +21,12 @@ public class IndustryController {
     @Autowired
     IndustryService industryService;
 
+    @Autowired
+    DescriptionService descriptionService;
+
     @RequestMapping("/{id}")
     @ResponseBody
     public Map<String, Object> getIndustryInfo(@PathVariable("id") int indId){
-//        Industry industry = industryService.findFullIndustryByIndId(indId);
-//        GraphData data = industryService.getEChartGraphData();
-//        return Tool.formatData(industry,data,"industry");
         Industry industry = industryService.findFullIndustryByIndId(indId);
         GraphData data = industryService.getEChartGraphData();
         List<HashMap<String,String>> relationGraphNodesList = industryService.getRelationGraphNodes();
@@ -50,5 +51,11 @@ public class IndustryController {
         List<HashMap<String,String>> relationGraphNodesList = industryService.getRelationGraphNodes();
         List<HashMap<String,String>> relationGraphLinesList = industryService.getRelationGraphLines();
         return Tool.formatNewData(industry,data,"industry",relationGraphNodesList,relationGraphLinesList);
+    }
+
+    @RequestMapping(value = "/description/{id}")
+    @ResponseBody
+    public Map<String, Object> getEntityDescription(@PathVariable("id") int indId){
+        return descriptionService.getEntityDesByEntityId(indId);
     }
 }

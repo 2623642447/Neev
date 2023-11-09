@@ -44,9 +44,6 @@ public class Industry {
     //产业内公司列表
     private List<Company> companyList;
 
-    //该产业的描述信息
-    private Description description;
-
     //该产业的上游产业列表
     private List<Industry> upIndustryList = new ArrayList<>();
 
@@ -97,14 +94,6 @@ public class Industry {
 
     public void setCompanyList(List<Company> companyList) {
         this.companyList = companyList;
-    }
-
-    public Description getDescription() {
-        return description;
-    }
-
-    public void setDescription(Description description) {
-        this.description = description;
     }
 
     public List<Industry> getUpIndustryList() {

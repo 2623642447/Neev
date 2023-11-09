@@ -6,7 +6,27 @@
         <id property="desId" column="desId"/>
     </resultMap>
 
+    <resultMap id="BaseResultMap" type="indi.zyang.neev.entity.Description">
+        <id property="entityId" column="entityId"/>
+    </resultMap>
+
     <select id="findDescriptionByDesId" resultMap="descriptionMapper">
         select * from description where desId = #{desId}
+    </select>
+
+    <select id="getDesByEntityId" resultMap="BaseResultMap">
+        select * from entity_des_r where entityId = #{entityId}
+    </select>
+
+    <select id="getDesDataByDesId" resultType="string">
+        SELECT data FROM description
+        where desid = #{desId}
+        order by id
+    </select>
+
+    <select id="getDesDateByDesId" resultType="string">
+        SELECT date FROM description
+        where desid = #{desId}
+        order by id
     </select>
 </mapper>

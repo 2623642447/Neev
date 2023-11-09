@@ -41,9 +41,7 @@ public class IndustryServiceImpl implements IndustryService {
     @Override
     public Industry findFullIndustryByIndId(int indId) {
         Industry industry = industryMapper.findIndustryByIndId(indId);
-        Description description = descriptionMapper.findDescriptionByDesId(indId);
         List<Company> companyList = companyMapper.findCompanyByIndId(indId);
-        industry.setDescription(description);
         industry.setCompanyList(companyList);
         return industry;
     }
@@ -100,8 +98,10 @@ public class IndustryServiceImpl implements IndustryService {
             HashMap<String,String> relationGraphNodeMap = new HashMap<>();
             String id = industryNode.getStringIndId();
             String text = industryNode.getIndName();
+            String color = industryNode.getColor();
             relationGraphNodeMap.put("id", id);
             relationGraphNodeMap.put("text",text);
+            relationGraphNodeMap.put("color",color);
             relationGraphNodesList.add(relationGraphNodeMap);
         }
         return relationGraphNodesList;
@@ -132,49 +132,4 @@ public class IndustryServiceImpl implements IndustryService {
         return relationGraphLinesList;
     }
 
-    public Map<String, String[]> getPointHistorical(List<Point> dataList) {
-        // 最终返回的集合
-        Map<String, String[]> map = new HashMap<>();
-        // 返回的时间的集合
-        String[] times = new String[dataList.size()];
-        String[] strings;
-        List<String> datetimeList = new ArrayList<>();
-        for (int i = 0; i < dataList.size(); i++) {
-            // 存储时间
-            String dates = dataList.get(i).getTime();
-            times[i] = dates;
-            if (!datetimeList.contains(times[i])) {
-                datetimeList.add(times[i]);
-            }
-        }
-        // 将y轴数据存入map
-        Map<String, List<Point>> PointDataMapByName = dataList.stream().collect(Collectors.groupingBy(Point::getPoint_name));
-        for (Map.Entry<String, List<Point>> stringListEntry : PointDataMapByName.entrySet()) {
-            String tagName = stringListEntry.getKey();
-            map.put(tagName, getTagVlaues(datetimeList, dataList, tagName));
-
-        }
-        strings = datetimeList.toArray(new String[datetimeList.size()]);
-        // 将x轴数据存入map
-        map.put("time", strings);
-        return map;
-    }
-    /**
-     * 存储y轴参数
-     **/
-    public String[] getTagVlaues(List<String> datetimeList, List<Point> dataList, String tagName) {
-        String[] values = new String[dataList.size()];
-        for (int i = 0; i < datetimeList.size (); i++) {
-            String datetimeStr = datetimeList.get(i);
-            Point pointData = dataList.stream().filter(data -> datetimeStr.equals(data.getTime())
-                    && tagName.equals(data.getPoint_name())).findFirst().orElse(null);
-            if(pointData != null){
-                String value = new BigDecimal(pointData.getValue()).setScale(4, BigDecimal.ROUND_DOWN).stripTrailingZeros().toPlainString();
-                values[i] = value;
-            }else{
-                values[i] = "0";
-            }
-        }
-        return values;
-    }
 }

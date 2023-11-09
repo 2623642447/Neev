@@ -6,19 +6,15 @@ import org.apache.ibatis.type.Alias;
 public class Description {
     private int desId;
 
+    private int entityId;
+
+    private String unit;
+
     private String desName;
 
-    private String desContent;
+    private String content;
 
-    private String desCategory;
-
-    public String getDesCategory() {
-        return desCategory;
-    }
-
-    public void setDesCategory(String desCategory) {
-        this.desCategory = desCategory;
-    }
+    private int isContain;
 
     public int getDesId() {
         return desId;
@@ -26,6 +22,22 @@ public class Description {
 
     public void setDesId(int desId) {
         this.desId = desId;
+    }
+
+    public int getEntityId() {
+        return entityId;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public String getDesName() {
@@ -36,11 +48,19 @@ public class Description {
         this.desName = desName;
     }
 
-    public String getDesContent() {
-        return desContent;
+    public String getContent() {
+        return content;
     }
 
-    public void setDesContent(String desContent) {
-        this.desContent = desContent;
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public int getIsContain() {
+        return isContain;
+    }
+
+    public void setIsContain(int isContain) {
+        this.isContain = isContain;
     }
 }
